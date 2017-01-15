@@ -5,11 +5,23 @@ import json
 
 class CurrResumeView(View):
     def get_error_json_response(self, errMsg):
+        '''
+        @param errMsg: error message
+        @return: JsonResponse 400 BAD REQUEST like {'error': errMsg}
+        '''
         json_response = {}
         json_response['error'] = errMsg
         return JsonResponse(json_response, status=400)
     
     def get(self, request):
+        '''
+        Get the most recent resume or error when none exists
+        body with current resume like
+            200 OK {'resume_body':'Body of the resume'}
+        but when resume not exists
+            400 BAD REQUEST like {'error': errMsg}
+        @return: JsonResponse 
+        '''
         try:
             curr_resume = Resume.objects.latest('date_created')
             json_response = {}
@@ -19,6 +31,15 @@ class CurrResumeView(View):
             return self.get_error_json_response('No resume uploaded yet.')
 
     def post(self, request):
+        '''
+        Add a new resume 
+        Simple validation before save for length
+        upon success
+            201 CREATED {'success':'Resume uploaded.'}
+        but when some error
+            400 BAD REQUEST like {'error': errMsg}
+        @return: JsonResponse 
+        '''
         try:
             json_data = json.loads(request.body)
             resume_body_data = json_data['resume_body']
@@ -32,7 +53,7 @@ class CurrResumeView(View):
                 resume = resume.save()
                 json_response = {}
                 json_response['success'] = 'Resume uploaded.'
-                return JsonResponse(json_response, status=200)
+                return JsonResponse(json_response, status=201)
         except ValueError:
             return self.get_error_json_response('Invalid json input.')
         except KeyError as e:
