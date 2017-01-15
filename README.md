@@ -1,5 +1,7 @@
 ## Setup server instructions -
 
+\# Run the following in shell
+
 git clone https://github.com/balajivenkatesh/resumebackend.git
 
 cd resumebackend
